@@ -1,0 +1,20 @@
+{
+  "name": "gean",
+  "version": "0.0.1",
+  "description": "Composable Generator Control",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "keywords": [
+    "tiny",
+    "generator",
+    "control"
+  ],
+  "author": "Joseph Werle <werle@littlstar.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "superagent": "^1.4.0",
+    "tape": "^4.2.2"
+  }
+}
