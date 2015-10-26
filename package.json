@@ -14,10 +14,7 @@
   "author": "Joseph Werle <werle@littlstar.com>",
   "license": "MIT",
   "devDependencies": {
-    "superagent": "^1.4.0",
-    "tape": "^4.2.2"
-  },
-  "dependencies": {
+    "browserify": "^12.0.0",
     "superagent": "^1.4.0",
     "tape": "^4.2.2"
   },

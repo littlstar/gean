@@ -1,7 +1,8 @@
 gean
 ====
 
-Composable Generator Control
+gean provides a mechanism for composable generator control with
+promises.
 
 ## why ?
 
@@ -25,7 +26,8 @@ gean(function * () {
 });
 ```
 
-All `gean()` functions return a `Promise` that allow for composability.
+`gean` accept a `GeneratorFunction` and returns a `Promise`
+that allow for composability.
 
 ## example
 
