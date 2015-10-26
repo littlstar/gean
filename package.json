@@ -16,5 +16,17 @@
   "devDependencies": {
     "superagent": "^1.4.0",
     "tape": "^4.2.2"
-  }
+  },
+  "dependencies": {
+    "superagent": "^1.4.0",
+    "tape": "^4.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/littlstar/gean.git"
+  },
+  "bugs": {
+    "url": "https://github.com/littlstar/gean/issues"
+  },
+  "homepage": "https://github.com/littlstar/gean#readme"
 }
