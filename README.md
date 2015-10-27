@@ -31,44 +31,29 @@ that allow for composability.
 
 ## example
 
-In this example we read random user data from the `randomuser` API and
-sum the number of `male` and `female` gender entries per user.
+We can use `gean` to create simple a `fetch` function backed by
+[superagent](https://github.com/visionmedia/superagent). We'll use it to
+read from the `randomuser` API and sum the number of `male` and `female`
+gender entries per user.
 
 ```js
-const gean = require('gean');
+import agent from 'superagent';
+import gean from 'gean';
+
+const fetch = uri => new Promise((yep, nope) => {
+  agent.get(uri).end((err, res) ? nope(err) : yep(res));
+};
+
 gean(function * () {
-  const uri = 'https://randomuser.me/api';
+  const uri = 'https://randomuser.me/api?results=10';
+  const res = yield fetch(uri);
+  const users = res.body.results;
+  const counter = {female: 0, male: 0};
 
-  const getUsers = limit => gean(function * () {
-    const response = yield fetch(`${uri}?results=${limit || 1}`);
-    const results = JSON.parse(response.text).results;
-    const data = results.map(result => result.user);
-    yield data;
-  });
+  for (let user of users)
+    counter[user.gender]++;
 
-  const pair = key => datum => ({key: key, value: datum});
-
-  const map = kv => gean(function * () { yield kv.value[kv.key]; });
-
-  const reduce = (state, value) => gean(function * () {
-    const counters = yield state;
-    counters[yield value]++;
-    yield counters;
-  });
-
-  const count = (key, data, counters) => gean(function * () {
-    yield data.map(pair(key)).map(map).reduce(reduce, counters)
-  });
-
-  const run = limit => gean(function * () {
-    const counters = {female: 0, male: 0};
-    const batch = [];
-    for (let i = 0; i < limit; ++i)
-      yield count('gender', yield getUsers(10), counters);
-    yield counters;
-  });
-
-  const counters = yield run(1);
+  console.log(counter)
   // { female: 8, male: 2 }
 });
 ```

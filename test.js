@@ -110,36 +110,28 @@ test('compose', t => {
     yield gean(function * () {
       const uri = 'https://randomuser.me/api';
       const getUsers = limit => gean(function * () {
-        const response = yield fetch(`${uri}?results=${limit || 1}`);
-        const results = JSON.parse(response.text).results;
-        const data = results.map(result => result.user);
-        yield data;
+        const res = yield fetch(`${uri}?results=${limit || 1}`);
+        yield res.body.results.map(result => result.user);
       });
 
       const pair = key => datum => ({key: key, value: datum});
-      const map = kv => gean(function * () {
-        yield kv.value[kv.key];
-      });
-
-      const reduce = (state, value) => gean(function * () {
+      const mapper = kv => gean(function * () { yield kv.value[kv.key]; });
+      const reducer = (state, value) => gean(function * () {
         const counters = yield state;
-        counters[yield value]++;
+        const key = yield value;
+        counters[key]++;
         yield counters;
       });
 
       const count = (key, data, counters) => gean(function * () {
-        yield data.map(pair(key)).map(map).reduce(reduce, counters)
+        yield data.map(pair(key)).map(mapper).reduce(reducer, counters);
       });
 
-      const run = limit => gean(function * () {
-        const counters = {female: 0, male: 0};
-        const batch = [];
-        for (let i = 0; i < limit; ++i)
-          yield count('gender', yield getUsers(10), counters);
-        yield counters;
+      const getGenderCount = limit => gean(function * () {
+        yield count('gender', yield getUsers(limit), {female: 0, male: 0});
       });
 
-      const counters = yield run(1);
+      const counters = yield getGenderCount(10);
       assert(counters.female);
       assert(counters.male);
     });

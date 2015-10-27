@@ -44,7 +44,7 @@ module.exports = (scope) => {
     const loop = (value) => {
       const yep = value => resolve(value);
       const nope = err => {
-        try { next(gen.throw(err)); }
+        try { next(it.throw(err)); }
         catch (_) {}
         reject(err);
       };
