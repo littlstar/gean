@@ -1,0 +1,9 @@
+{
+  "name": "gean",
+  "version": "0.0.4",
+  "description": "Composable Generator Control",
+  "main": "index.js",
+  "author": "Joseph Werle <werle@littlstar.com>",
+  "license": "MIT",
+  "scripts": ["index.js"]
+}
