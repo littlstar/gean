@@ -32,6 +32,8 @@ module.exports = (scope) => {
   let state = null;
   const it = scope();
   return new Promise((resolve, reject) => {
+    // begin loop
+    setTimeout(_ => loop(undefined));
 
     /**
      * loop and provide values to promises.
@@ -43,6 +45,7 @@ module.exports = (scope) => {
      */
 
     loop = (value) => {
+      // get state for value
       try { state = it.next(value); }
       catch (e) { return reject(e); }
 
@@ -55,17 +58,18 @@ module.exports = (scope) => {
        * @param {Mixed} value
        */
 
-      const next = value => {
-        if (isPromise(value)) value.then(loop).catch(reject);
-        else if (value) setTimeout(_ => loop(value));
+      const next = (value) => {
+        if (isPromise(value))
+          value.then(loop).catch(reject);
+        else if (value)
+          setTimeout(_ => loop(value));
       };
 
       // resolve if done
-      if (null == state || true == state.done) return resolve(value);
-      else next(state.value);
+      if (null == state || true == state.done)
+        return resolve(value);
+      else
+        return next(state.value);
     };
-
-    // begin loop
-    loop(undefined);
   });
-}
+};
