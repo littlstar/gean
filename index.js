@@ -28,6 +28,7 @@ const isPromise = p => p && (p instanceof Promise ||
  */
 
 module.exports = (scope) => {
+  let loop = null;
   let state = null;
   const it = scope();
   return new Promise((resolve, reject) => {
@@ -41,16 +42,9 @@ module.exports = (scope) => {
      * @param {Mixed} value
      */
 
-    const loop = (value) => {
-      const yep = value => resolve(value);
-      const nope = err => {
-        try { next(it.throw(err)); }
-        catch (_) {}
-        reject(err);
-      };
-
+    loop = (value) => {
       try { state = it.next(value); }
-      catch (e) { return nope(e); }
+      catch (e) { return reject(e); }
 
       /**
        * provide value to promise if available.
@@ -62,16 +56,16 @@ module.exports = (scope) => {
        */
 
       const next = value => {
-        if (isPromise(value)) value.then(loop).catch(nope);
+        if (isPromise(value)) value.then(loop).catch(reject);
         else if (value) setTimeout(_ => loop(value));
       };
 
       // resolve if done
-      if (null == state || true == state.done) return yep(value);
+      if (null == state || true == state.done) return resolve(value);
       else next(state.value);
     };
 
     // begin loop
-    loop(null);
+    loop(undefined);
   });
 }
