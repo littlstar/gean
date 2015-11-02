@@ -37,21 +37,22 @@ read from the `randomuser` API and sum the number of `male` and `female`
 gender entries per user.
 
 ```js
+'use strict';
 import agent from 'superagent';
 import gean from 'gean';
 
 const fetch = uri => new Promise((yep, nope) => {
-  agent.get(uri).end((err, res) ? nope(err) : yep(res));
-};
+  agent.get(uri).end((err, res) => err ? nope(err) : yep(res));
+});
 
 gean(function * () {
   const uri = 'https://randomuser.me/api?results=10';
   const res = yield fetch(uri);
-  const users = res.body.results;
+  const results = res.body.results;
   const counter = {female: 0, male: 0};
 
-  for (let user of users)
-    counter[user.gender]++;
+  for (let result of results)
+    counter[result.user.gender]++;
 
   console.log(counter)
   // { female: 8, male: 2 }
