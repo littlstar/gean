@@ -59,10 +59,16 @@ module.exports = (scope) => {
        */
 
       const next = (value) => {
-        if (isPromise(value))
-          value.then(loop).catch(reject);
-        else if (value)
+        if (isPromise(value)) {
+          const chain = value.then(loop);
+          if ('function' == typeof chain.catch) {
+            chain.catch(reject);
+          } else if ('function' == typeof chain.fail) {
+            chain.fail(reject);
+          }
+        } else if (value) {
           setTimeout(_ => loop(value));
+        }
       };
 
       // resolve if done
