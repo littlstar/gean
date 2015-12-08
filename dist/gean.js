@@ -29,9 +29,12 @@ const isPromise = p => p && (p instanceof Promise ||
  */
 
 module.exports = (scope) => {
+  let loop = null;
   let state = null;
   const it = scope();
   return new Promise((resolve, reject) => {
+    // begin loop
+    setTimeout(_ => loop(undefined));
 
     /**
      * loop and provide values to promises.
@@ -42,16 +45,10 @@ module.exports = (scope) => {
      * @param {Mixed} value
      */
 
-    const loop = (value) => {
-      const yep = value => resolve(value);
-      const nope = err => {
-        try { next(gen.throw(err)); }
-        catch (_) {}
-        reject(err);
-      };
-
+    loop = (value) => {
+      // get state for value
       try { state = it.next(value); }
-      catch (e) { return nope(e); }
+      catch (e) { return reject(e); }
 
       /**
        * provide value to promise if available.
@@ -62,19 +59,26 @@ module.exports = (scope) => {
        * @param {Mixed} value
        */
 
-      const next = value => {
-        if (isPromise(value)) value.then(loop).catch(nope);
-        else if (value) setTimeout(_ => loop(value));
+      const next = (value) => {
+        if (isPromise(value)) {
+          const chain = value.then(loop);
+          if ('function' == typeof chain.catch) {
+            chain.catch(reject);
+          } else if ('function' == typeof chain.fail) {
+            chain.fail(reject);
+          }
+        } else if (value) {
+          setTimeout(_ => loop(value));
+        }
       };
 
       // resolve if done
-      if (null == state || true == state.done) return yep(value);
-      else next(state.value);
+      if (null == state || true == state.done)
+        return resolve(value);
+      else
+        return next(state.value);
     };
-
-    // begin loop
-    loop(null);
   });
-}
+};
 
 },{}]},{},[1]);
